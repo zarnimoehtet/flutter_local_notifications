@@ -21,29 +21,10 @@ int id = 0;
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
-/// Streams are created so that app can respond to notification-related events
-/// since the plugin is initialised in the `main` function
-final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
-    StreamController<ReceivedNotification>.broadcast();
-
 const MethodChannel platform =
     MethodChannel('dexterx.dev/flutter_local_notifications_example');
 
 const String portName = 'notification_send_port';
-
-class ReceivedNotification {
-  ReceivedNotification({
-    required this.id,
-    required this.title,
-    required this.body,
-    required this.payload,
-  });
-
-  final int id;
-  final String? title;
-  final String? body;
-  final String? payload;
-}
 
 String? selectedNotificationPayload;
 
@@ -149,17 +130,6 @@ Future<void> main() async {
     requestAlertPermission: false,
     requestBadgePermission: false,
     requestSoundPermission: false,
-    onDidReceiveLocalNotification:
-        (int id, String? title, String? body, String? payload) async {
-      didReceiveLocalNotificationStream.add(
-        ReceivedNotification(
-          id: id,
-          title: title,
-          body: body,
-          payload: payload,
-        ),
-      );
-    },
     notificationCategories: darwinNotificationCategories,
   );
   final LinuxInitializationSettings initializationSettingsLinux =
@@ -173,8 +143,7 @@ Future<void> main() async {
     macOS: initializationSettingsDarwin,
     linux: initializationSettingsLinux,
   );
-  flutterLocalNotificationsPlugin.onDidReceiveNotificationResponse.stream
-      .listen((NotificationResponse notificationResponse) {});
+
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
     onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
@@ -247,7 +216,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _isAndroidPermissionGranted();
     _requestPermissions();
-    _configureDidReceiveLocalNotificationSubject();
+    _subscribeToReceivingUILocalNotifications();
     _subscribeToNotificationResponseEvents();
   }
 
@@ -295,64 +264,71 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _configureDidReceiveLocalNotificationSubject() {
-    didReceiveLocalNotificationStream.stream
-        .listen((ReceivedNotification receivedNotification) async {
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) => CupertinoAlertDialog(
-          title: receivedNotification.title != null
-              ? Text(receivedNotification.title!)
-              : null,
-          content: receivedNotification.body != null
-              ? Text(receivedNotification.body!)
-              : null,
-          actions: <Widget>[
-            CupertinoDialogAction(
-              isDefaultAction: true,
-              onPressed: () async {
-                Navigator.of(context, rootNavigator: true).pop();
-                await Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (BuildContext context) =>
-                        SecondPage(receivedNotification.payload),
-                  ),
-                );
-              },
-              child: const Text('Ok'),
-            )
-          ],
-        ),
-      );
-    });
+  void _subscribeToReceivingUILocalNotifications() {
+    flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
+        ?.onDidReceiveUILocalNotification
+        .stream
+        .listen(
+            (ReceivedUILocalNotification receivedUILocalNotification) async =>
+                await _processReceivedUILocalNotification(
+                    receivedUILocalNotification));
+  }
+
+  Future<void> _processReceivedUILocalNotification(
+      ReceivedUILocalNotification receivedUILocalNotification) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: receivedUILocalNotification.title != null
+            ? Text(receivedUILocalNotification.title!)
+            : null,
+        content: receivedUILocalNotification.body != null
+            ? Text(receivedUILocalNotification.body!)
+            : null,
+        actions: <Widget>[
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () async {
+              Navigator.of(context, rootNavigator: true).pop();
+              await Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (BuildContext context) =>
+                      SecondPage(receivedUILocalNotification.payload),
+                ),
+              );
+            },
+            child: const Text('Ok'),
+          )
+        ],
+      ),
+    );
   }
 
   void _subscribeToNotificationResponseEvents() {
     flutterLocalNotificationsPlugin.onDidReceiveNotificationResponse.stream
-        .listen((NotificationResponse notificationResponse) async {
-      switch (notificationResponse.notificationResponseType) {
-        case NotificationResponseType.selectedNotification:
+        .listen((NotificationResponse notificationResponse) async =>
+            _processNotificationResponse(notificationResponse));
+  }
+
+  void _processNotificationResponse(NotificationResponse notificationResponse) {
+    switch (notificationResponse.notificationResponseType) {
+      case NotificationResponseType.selectedNotification:
+        _showSecondPage(notificationResponse.payload);
+        break;
+      case NotificationResponseType.selectedNotificationAction:
+        if (notificationResponse.actionId == navigationActionId) {
           _showSecondPage(notificationResponse.payload);
-          break;
-        case NotificationResponseType.selectedNotificationAction:
-          if (notificationResponse.actionId == navigationActionId) {
-            _showSecondPage(notificationResponse.payload);
-          }
-          break;
-      }
-    });
+        }
+        break;
+    }
   }
 
   void _showSecondPage(String? payload) {
     Navigator.of(context).push(MaterialPageRoute<void>(
       builder: (BuildContext context) => SecondPage(payload),
     ));
-  }
-
-  @override
-  void dispose() {
-    didReceiveLocalNotificationStream.close();
-    super.dispose();
   }
 
   @override

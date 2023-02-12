@@ -43,5 +43,5 @@ export 'src/platform_specifics/darwin/notification_category.dart';
 export 'src/platform_specifics/darwin/notification_category_option.dart';
 export 'src/platform_specifics/darwin/notification_details.dart';
 export 'src/platform_specifics/ios/enums.dart';
-export 'src/typedefs.dart';
+export 'src/platform_specifics/ios/received_ui_local_notification.dart';
 export 'src/types.dart';

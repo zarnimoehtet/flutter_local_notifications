@@ -24,8 +24,8 @@ import 'platform_specifics/darwin/initialization_settings.dart';
 import 'platform_specifics/darwin/mappers.dart';
 import 'platform_specifics/darwin/notification_details.dart';
 import 'platform_specifics/ios/enums.dart';
+import 'platform_specifics/ios/received_ui_local_notification.dart';
 import 'type_mappers.dart';
-import 'typedefs.dart';
 import 'types.dart';
 import 'tz_datetime_mapper.dart';
 
@@ -606,7 +606,16 @@ class AndroidFlutterLocalNotificationsPlugin
 /// iOS implementation of the local notifications plugin.
 class IOSFlutterLocalNotificationsPlugin
     extends MethodChannelFlutterLocalNotificationsPlugin {
-  DidReceiveLocalNotificationCallback? _onDidReceiveLocalNotification;
+  /// Returns a stream that emits when a notification is triggered whilst the
+  /// app is in the foreground on iOS versions older than 10.
+  ///
+  /// Applications need to use the details to decide what to do (e.g. show an
+  /// alert) as iOS versions older than 10 don't show a notification when the
+  /// app is in the foreground.
+  final StreamController<ReceivedUILocalNotification>
+      // ignore: close_sinks
+      onDidReceiveUILocalNotification =
+      StreamController<ReceivedUILocalNotification>.broadcast();
 
   /// Initializes the plugin.
   ///
@@ -622,9 +631,6 @@ class IOSFlutterLocalNotificationsPlugin
   /// [requestPermissions] can then be called to request permissions when
   /// needed.
   ///
-  /// The [onDidReceiveNotificationResponse] callback is fired when the user
-  /// selects a notification or notification action that should show the
-  /// application/user interface.
   /// application was running. To handle when a notification launched an
   /// application, use [getNotificationAppLaunchDetails]. For notification
   /// actions that don't show the application/user interface, the
@@ -638,8 +644,6 @@ class IOSFlutterLocalNotificationsPlugin
     DidReceiveBackgroundNotificationResponseCallback?
         onDidReceiveBackgroundNotificationResponse,
   }) async {
-    _onDidReceiveLocalNotification =
-        initializationSettings.onDidReceiveLocalNotification;
     _channel.setMethodCallHandler(_handleMethod);
 
     final Map<String, Object> arguments = initializationSettings.toMap();
@@ -844,11 +848,14 @@ class IOSFlutterLocalNotificationsPlugin
         );
         break;
       case 'didReceiveLocalNotification':
-        _onDidReceiveLocalNotification!(
-            call.arguments['id'],
-            call.arguments['title'],
-            call.arguments['body'],
-            call.arguments['payload']);
+        onDidReceiveUILocalNotification.add(
+          ReceivedUILocalNotification(
+            id: call.arguments['id'],
+            title: call.arguments['title'],
+            body: call.arguments['body'],
+            payload: call.arguments['payload'],
+          ),
+        );
         break;
       default:
         return await Future<void>.error('Method not defined');
