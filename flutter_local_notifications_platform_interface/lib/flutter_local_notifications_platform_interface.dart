@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'src/types.dart';
@@ -26,6 +28,13 @@ abstract class FlutterLocalNotificationsPlatform extends PlatformInterface {
     PlatformInterface.verifyToken(instance, _token);
     _instance = instance;
   }
+
+  /// Returns a [Stream] that emits when a user taps on  notification or a
+  /// notification action.
+  static final StreamController<NotificationResponse>
+      // ignore: close_sinks
+      onDidReceiveNotificationResponse =
+      StreamController<NotificationResponse>.broadcast();
 
   /// Returns info on if a notification had been used to launch the application.
   Future<NotificationAppLaunchDetails?>

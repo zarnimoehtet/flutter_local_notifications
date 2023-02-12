@@ -16,10 +16,7 @@ abstract class FlutterLocalNotificationsPlatformLinux
   ///
   /// The [onDidReceiveNotificationResponse] callback is fired when the user
   /// selects a notification or notification action.
-  Future<bool?> initialize(
-    LinuxInitializationSettings initializationSettings, {
-    DidReceiveNotificationResponseCallback? onDidReceiveNotificationResponse,
-  });
+  Future<bool?> initialize(LinuxInitializationSettings initializationSettings);
 
   /// Show a notification with an optional payload that will be passed back to
   /// the app when a notification is tapped on.

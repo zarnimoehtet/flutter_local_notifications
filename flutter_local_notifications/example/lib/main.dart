@@ -26,9 +26,6 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
     StreamController<ReceivedNotification>.broadcast();
 
-final StreamController<String?> selectNotificationStream =
-    StreamController<String?>.broadcast();
-
 const MethodChannel platform =
     MethodChannel('dexterx.dev/flutter_local_notifications_example');
 
@@ -176,21 +173,10 @@ Future<void> main() async {
     macOS: initializationSettingsDarwin,
     linux: initializationSettingsLinux,
   );
+  flutterLocalNotificationsPlugin.onDidReceiveNotificationResponse.stream
+      .listen((NotificationResponse notificationResponse) {});
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
-    onDidReceiveNotificationResponse:
-        (NotificationResponse notificationResponse) {
-      switch (notificationResponse.notificationResponseType) {
-        case NotificationResponseType.selectedNotification:
-          selectNotificationStream.add(notificationResponse.payload);
-          break;
-        case NotificationResponseType.selectedNotificationAction:
-          if (notificationResponse.actionId == navigationActionId) {
-            selectNotificationStream.add(notificationResponse.payload);
-          }
-          break;
-      }
-    },
     onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
   );
   runApp(
@@ -262,7 +248,7 @@ class _HomePageState extends State<HomePage> {
     _isAndroidPermissionGranted();
     _requestPermissions();
     _configureDidReceiveLocalNotificationSubject();
-    _configureSelectNotificationSubject();
+    _subscribeToNotificationResponseEvents();
   }
 
   Future<void> _isAndroidPermissionGranted() async {
@@ -341,18 +327,31 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _configureSelectNotificationSubject() {
-    selectNotificationStream.stream.listen((String? payload) async {
-      await Navigator.of(context).push(MaterialPageRoute<void>(
-        builder: (BuildContext context) => SecondPage(payload),
-      ));
+  void _subscribeToNotificationResponseEvents() {
+    flutterLocalNotificationsPlugin.onDidReceiveNotificationResponse.stream
+        .listen((NotificationResponse notificationResponse) async {
+      switch (notificationResponse.notificationResponseType) {
+        case NotificationResponseType.selectedNotification:
+          _showSecondPage(notificationResponse.payload);
+          break;
+        case NotificationResponseType.selectedNotificationAction:
+          if (notificationResponse.actionId == navigationActionId) {
+            _showSecondPage(notificationResponse.payload);
+          }
+          break;
+      }
     });
+  }
+
+  void _showSecondPage(String? payload) {
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (BuildContext context) => SecondPage(payload),
+    ));
   }
 
   @override
   void dispose() {
     didReceiveLocalNotificationStream.close();
-    selectNotificationStream.close();
     super.dispose();
   }
 

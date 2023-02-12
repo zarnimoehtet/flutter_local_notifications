@@ -44,8 +44,7 @@ class LinuxNotificationManager {
   final NotificationStorage _storage;
 
   late final LinuxInitializationSettings _initializationSettings;
-  late final DidReceiveNotificationResponseCallback?
-      _onDidReceiveNotificationResponse;
+
   late final LinuxPlatformInfoData _platformData;
 
   bool _initialized = false;
@@ -53,15 +52,12 @@ class LinuxNotificationManager {
   /// Initializes the manager.
   /// Call this method on application before using the manager further.
   Future<bool> initialize(
-    LinuxInitializationSettings initializationSettings, {
-    DidReceiveNotificationResponseCallback? onDidReceiveNotificationResponse,
-  }) async {
+      LinuxInitializationSettings initializationSettings) async {
     if (_initialized) {
       return _initialized;
     }
     _initialized = true;
     _initializationSettings = initializationSettings;
-    _onDidReceiveNotificationResponse = onDidReceiveNotificationResponse;
     _dbus.build(
       destination: _DBusInterfaceSpec.destination,
       path: _DBusInterfaceSpec.path,
@@ -340,7 +336,8 @@ class LinuxNotificationManager {
           return;
         }
         if (actionKey == _kDefaultActionName) {
-          _onDidReceiveNotificationResponse?.call(
+          FlutterLocalNotificationsPlatform.onDidReceiveNotificationResponse
+              .add(
             NotificationResponse(
               id: notify.id,
               payload: notify.payload,
@@ -356,7 +353,8 @@ class LinuxNotificationManager {
           if (actionInfo == null) {
             return;
           }
-          _onDidReceiveNotificationResponse?.call(
+          FlutterLocalNotificationsPlatform.onDidReceiveNotificationResponse
+              .add(
             NotificationResponse(
               id: notify.id,
               actionId: actionInfo.key,

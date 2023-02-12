@@ -1,3 +1,7 @@
+## [7.0.0-dev.1]
+
+* **Breaking change** removed `DidReceiveNotificationResponseCallback` typedef
+
 ## [6.0.0]
 
 * **Breaking change** the parameters of `ActiveNotification`'s constructor are now are named instead of positional

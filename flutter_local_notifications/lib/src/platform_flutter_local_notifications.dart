@@ -117,8 +117,6 @@ class MethodChannelFlutterLocalNotificationsPlugin
 /// Android implementation of the local notifications plugin.
 class AndroidFlutterLocalNotificationsPlugin
     extends MethodChannelFlutterLocalNotificationsPlugin {
-  DidReceiveNotificationResponseCallback? _ondidReceiveNotificationResponse;
-
   /// Initializes the plugin.
   ///
   /// Call this method on application before using the
@@ -137,11 +135,9 @@ class AndroidFlutterLocalNotificationsPlugin
   /// annotation to ensure they are not stripped out by the Dart compiler.
   Future<bool> initialize(
     AndroidInitializationSettings initializationSettings, {
-    DidReceiveNotificationResponseCallback? onDidReceiveNotificationResponse,
     DidReceiveBackgroundNotificationResponseCallback?
         onDidReceiveBackgroundNotificationResponse,
   }) async {
-    _ondidReceiveNotificationResponse = onDidReceiveNotificationResponse;
     _channel.setMethodCallHandler(_handleMethod);
 
     final Map<String, Object> arguments = initializationSettings.toMap();
@@ -590,7 +586,7 @@ class AndroidFlutterLocalNotificationsPlugin
   Future<void> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case 'didReceiveNotificationResponse':
-        _ondidReceiveNotificationResponse?.call(
+        FlutterLocalNotificationsPlatform.onDidReceiveNotificationResponse.add(
           NotificationResponse(
             id: call.arguments['notificationId'],
             actionId: call.arguments['actionId'],
@@ -610,7 +606,6 @@ class AndroidFlutterLocalNotificationsPlugin
 /// iOS implementation of the local notifications plugin.
 class IOSFlutterLocalNotificationsPlugin
     extends MethodChannelFlutterLocalNotificationsPlugin {
-  DidReceiveNotificationResponseCallback? _onDidReceiveNotificationResponse;
   DidReceiveLocalNotificationCallback? _onDidReceiveLocalNotification;
 
   /// Initializes the plugin.
@@ -640,11 +635,9 @@ class IOSFlutterLocalNotificationsPlugin
   /// annotation to ensure they are not stripped out by the Dart compiler.
   Future<bool?> initialize(
     DarwinInitializationSettings initializationSettings, {
-    DidReceiveNotificationResponseCallback? onDidReceiveNotificationResponse,
     DidReceiveBackgroundNotificationResponseCallback?
         onDidReceiveBackgroundNotificationResponse,
   }) async {
-    _onDidReceiveNotificationResponse = onDidReceiveNotificationResponse;
     _onDidReceiveLocalNotification =
         initializationSettings.onDidReceiveLocalNotification;
     _channel.setMethodCallHandler(_handleMethod);
@@ -839,7 +832,7 @@ class IOSFlutterLocalNotificationsPlugin
   Future<void> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case 'didReceiveNotificationResponse':
-        _onDidReceiveNotificationResponse?.call(
+        FlutterLocalNotificationsPlatform.onDidReceiveNotificationResponse.add(
           NotificationResponse(
             id: call.arguments['notificationId'],
             actionId: call.arguments['actionId'],
@@ -866,8 +859,6 @@ class IOSFlutterLocalNotificationsPlugin
 /// macOS implementation of the local notifications plugin.
 class MacOSFlutterLocalNotificationsPlugin
     extends MethodChannelFlutterLocalNotificationsPlugin {
-  DidReceiveNotificationResponseCallback? _onDidReceiveNotificationResponse;
-
   /// Initializes the plugin.
   ///
   /// Call this method on application before using the plugin further.
@@ -888,10 +879,7 @@ class MacOSFlutterLocalNotificationsPlugin
   /// application was running. To handle when a notification launched an
   /// application, use [getNotificationAppLaunchDetails].
   Future<bool?> initialize(
-    DarwinInitializationSettings initializationSettings, {
-    DidReceiveNotificationResponseCallback? onDidReceiveNotificationResponse,
-  }) async {
-    _onDidReceiveNotificationResponse = onDidReceiveNotificationResponse;
+      DarwinInitializationSettings initializationSettings) async {
     _channel.setMethodCallHandler(_handleMethod);
     return await _channel.invokeMethod(
         'initialize', initializationSettings.toMap());
@@ -989,7 +977,7 @@ class MacOSFlutterLocalNotificationsPlugin
   Future<void> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case 'didReceiveNotificationResponse':
-        _onDidReceiveNotificationResponse?.call(
+        FlutterLocalNotificationsPlatform.onDidReceiveNotificationResponse.add(
           NotificationResponse(
             id: call.arguments['notificationId'],
             actionId: call.arguments['actionId'],

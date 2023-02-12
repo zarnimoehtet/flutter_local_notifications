@@ -47,6 +47,11 @@ class FlutterLocalNotificationsPlugin {
   static final FlutterLocalNotificationsPlugin _instance =
       FlutterLocalNotificationsPlugin._();
 
+  /// Returns a [Stream] that emits when a user taps on  notification or a
+  /// notification action.
+  StreamController<NotificationResponse> get onDidReceiveNotificationResponse =>
+      FlutterLocalNotificationsPlatform.onDidReceiveNotificationResponse;
+
   /// Returns the underlying platform-specific implementation of given type [T],
   /// which must be a concrete subclass of [FlutterLocalNotificationsPlatform](https://pub.dev/documentation/flutter_local_notifications_platform_interface/latest/flutter_local_notifications_platform_interface/FlutterLocalNotificationsPlatform-class.html)
   ///
@@ -124,7 +129,6 @@ class FlutterLocalNotificationsPlugin {
   /// annotation to ensure they are not stripped out by the Dart compiler.
   Future<bool?> initialize(
     InitializationSettings initializationSettings, {
-    DidReceiveNotificationResponseCallback? onDidReceiveNotificationResponse,
     DidReceiveBackgroundNotificationResponseCallback?
         onDidReceiveBackgroundNotificationResponse,
   }) async {
@@ -142,7 +146,6 @@ class FlutterLocalNotificationsPlugin {
               AndroidFlutterLocalNotificationsPlugin>()
           ?.initialize(
         initializationSettings.android!,
-        onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
         onDidReceiveBackgroundNotificationResponse:
             onDidReceiveBackgroundNotificationResponse,
       );
@@ -156,7 +159,6 @@ class FlutterLocalNotificationsPlugin {
               IOSFlutterLocalNotificationsPlugin>()
           ?.initialize(
         initializationSettings.iOS!,
-        onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
         onDidReceiveBackgroundNotificationResponse:
             onDidReceiveBackgroundNotificationResponse,
       );
@@ -170,7 +172,6 @@ class FlutterLocalNotificationsPlugin {
               MacOSFlutterLocalNotificationsPlugin>()
           ?.initialize(
         initializationSettings.macOS!,
-        onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
       );
     } else if (defaultTargetPlatform == TargetPlatform.linux) {
       if (initializationSettings.linux == null) {
@@ -180,10 +181,7 @@ class FlutterLocalNotificationsPlugin {
 
       return await resolvePlatformSpecificImplementation<
               LinuxFlutterLocalNotificationsPlugin>()
-          ?.initialize(
-        initializationSettings.linux!,
-        onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
-      );
+          ?.initialize(initializationSettings.linux!);
     }
     return true;
   }

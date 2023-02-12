@@ -34,13 +34,8 @@ class LinuxFlutterLocalNotificationsPlugin
   /// notification action IDs.
   @override
   Future<bool?> initialize(
-    LinuxInitializationSettings initializationSettings, {
-    DidReceiveNotificationResponseCallback? onDidReceiveNotificationResponse,
-  }) =>
-      _manager.initialize(
-        initializationSettings,
-        onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
-      );
+          LinuxInitializationSettings initializationSettings) =>
+      _manager.initialize(initializationSettings);
 
   /// Show a notification with an optional payload that will be passed back to
   /// the app when a notification is tapped on.

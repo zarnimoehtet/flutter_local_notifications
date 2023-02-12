@@ -22,9 +22,7 @@ class LinuxFlutterLocalNotificationsPlugin
   /// compile-time dependencies, and should never actually be called.
   @override
   Future<bool?> initialize(
-    LinuxInitializationSettings initializationSettings, {
-    DidReceiveNotificationResponseCallback? onDidReceiveNotificationResponse,
-  }) async {
+      LinuxInitializationSettings initializationSettings) async {
     assert(false);
     return null;
   }

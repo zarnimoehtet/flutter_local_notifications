@@ -24,8 +24,6 @@ void main() {
     late final DBusRemoteObjectSignalStream mockNotifyClosedSignal;
     late final LinuxPlatformInfo mockPlatformInfo;
     late final NotificationStorage mockStorage;
-    late final DidReceiveNotificationResponseCallback
-        mockDidReceiveNotificationResponseCallback;
 
     const LinuxPlatformInfoData platformInfo = LinuxPlatformInfoData(
       appName: 'Test',
@@ -47,8 +45,6 @@ void main() {
       mockNotifyClosedSignal = MockDBusRemoteObjectSignalStream();
       mockPlatformInfo = MockLinuxPlatformInfo();
       mockStorage = MockNotificationStorage();
-      mockDidReceiveNotificationResponseCallback =
-          MockDidReceiveNotificationResponseCallback();
 
       when(
         () => mockPlatformInfo.getAll(),
@@ -68,9 +64,6 @@ void main() {
       when(
         () => mockDbus.subscribeSignal('NotificationClosed'),
       ).thenAnswer((_) => mockNotifyClosedSignal);
-      when(
-        () => mockDidReceiveNotificationResponseCallback.call(any()),
-      ).thenAnswer((_) async => <void>{});
     });
 
     setUp(() {
@@ -1263,11 +1256,7 @@ void main() {
         return FakeStreamSubscription<DBusSignal>();
       });
 
-      await manager.initialize(
-        initSettings,
-        onDidReceiveNotificationResponse:
-            mockDidReceiveNotificationResponseCallback,
-      );
+      await manager.initialize(initSettings);
       await Future.forEach(
         completers,
         (Completer<void> completer) => completer.future,
@@ -1426,11 +1415,7 @@ void main() {
         return FakeStreamSubscription<DBusSignal>();
       });
 
-      await manager.initialize(
-        initSettings,
-        onDidReceiveNotificationResponse:
-            mockDidReceiveNotificationResponseCallback,
-      );
+      await manager.initialize(initSettings);
       await Future.forEach(
         completers,
         (Completer<void> completer) => completer.future,
