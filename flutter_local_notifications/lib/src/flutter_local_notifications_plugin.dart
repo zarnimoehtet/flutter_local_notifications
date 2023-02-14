@@ -50,7 +50,8 @@ class FlutterLocalNotificationsPlugin {
   /// Returns a [Stream] that emits when a user taps on  notification or a
   /// notification action.
   StreamController<NotificationResponse> get onDidReceiveNotificationResponse =>
-      FlutterLocalNotificationsPlatform.onDidReceiveNotificationResponse;
+      FlutterLocalNotificationsPlatform
+          .instance.onDidReceiveNotificationResponse;
 
   /// Returns the underlying platform-specific implementation of given type [T],
   /// which must be a concrete subclass of [FlutterLocalNotificationsPlatform](https://pub.dev/documentation/flutter_local_notifications_platform_interface/latest/flutter_local_notifications_platform_interface/FlutterLocalNotificationsPlatform-class.html)

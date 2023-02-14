@@ -122,17 +122,13 @@ class AndroidFlutterLocalNotificationsPlugin
   /// Call this method on application before using the
   /// plugin further.
   ///
-  /// The [onDidReceiveNotificationResponse] callback is fired when the user
-  /// selects a notification or notification action that should show the
-  /// application/user interface.
-  /// application was running. To handle when a notification launched an
-  /// application, use [getNotificationAppLaunchDetails]. For notification
-  /// actions that don't show the application/user interface, the
-  /// [onDidReceiveBackgroundNotificationResponse] callback is invoked on
-  /// a background isolate. Functions passed to the
-  /// [onDidReceiveBackgroundNotificationResponse]
-  /// callback need to be annotated with the `@pragma('vm:entry-point')`
-  /// annotation to ensure they are not stripped out by the Dart compiler.
+  /// Selecting/tapping a notification action that isn't configured show the
+  /// application/user interface invoke the
+  /// [onDidReceiveBackgroundNotificationResponse] callback on a background
+  /// isolate. Functions passed to the
+  /// [onDidReceiveBackgroundNotificationResponse] callback need to be annotated
+  /// with the `@pragma('vm:entry-point')` annotation to ensure they are not
+  /// stripped out by the Dart compiler.
   Future<bool> initialize(
     AndroidInitializationSettings initializationSettings, {
     DidReceiveBackgroundNotificationResponseCallback?
@@ -586,7 +582,7 @@ class AndroidFlutterLocalNotificationsPlugin
   Future<void> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case 'didReceiveNotificationResponse':
-        FlutterLocalNotificationsPlatform.onDidReceiveNotificationResponse.add(
+        onDidReceiveNotificationResponse.add(
           NotificationResponse(
             id: call.arguments['notificationId'],
             actionId: call.arguments['actionId'],
@@ -631,14 +627,13 @@ class IOSFlutterLocalNotificationsPlugin
   /// [requestPermissions] can then be called to request permissions when
   /// needed.
   ///
-  /// application was running. To handle when a notification launched an
-  /// application, use [getNotificationAppLaunchDetails]. For notification
-  /// actions that don't show the application/user interface, the
-  /// [onDidReceiveBackgroundNotificationResponse] callback is invoked on
-  /// a background isolate. Functions passed to the
-  /// [onDidReceiveBackgroundNotificationResponse]
-  /// callback need to be annotated with the `@pragma('vm:entry-point')`
-  /// annotation to ensure they are not stripped out by the Dart compiler.
+  /// Selecting/tapping a notification action that isn't configured show the
+  /// application/user interface invoke the
+  /// [onDidReceiveBackgroundNotificationResponse] callback on a background
+  /// isolate. Functions passed to the
+  /// [onDidReceiveBackgroundNotificationResponse] callback need to be annotated
+  /// with the `@pragma('vm:entry-point')` annotation to ensure they are not
+  /// stripped out by the Dart compiler.
   Future<bool?> initialize(
     DarwinInitializationSettings initializationSettings, {
     DidReceiveBackgroundNotificationResponseCallback?
@@ -836,7 +831,7 @@ class IOSFlutterLocalNotificationsPlugin
   Future<void> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case 'didReceiveNotificationResponse':
-        FlutterLocalNotificationsPlatform.onDidReceiveNotificationResponse.add(
+        onDidReceiveNotificationResponse.add(
           NotificationResponse(
             id: call.arguments['notificationId'],
             actionId: call.arguments['actionId'],
@@ -880,11 +875,6 @@ class MacOSFlutterLocalNotificationsPlugin
   /// [DarwinInitializationSettings.requestSoundPermission] values to false.
   /// [requestPermissions] can then be called to request permissions when
   /// needed.
-  ///
-  /// The [onDidReceiveNotificationResponse] callback is fired when the user
-  /// interacts with a notification that was displayed by the plugin and the
-  /// application was running. To handle when a notification launched an
-  /// application, use [getNotificationAppLaunchDetails].
   Future<bool?> initialize(
       DarwinInitializationSettings initializationSettings) async {
     _channel.setMethodCallHandler(_handleMethod);
@@ -984,7 +974,7 @@ class MacOSFlutterLocalNotificationsPlugin
   Future<void> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case 'didReceiveNotificationResponse':
-        FlutterLocalNotificationsPlatform.onDidReceiveNotificationResponse.add(
+        onDidReceiveNotificationResponse.add(
           NotificationResponse(
             id: call.arguments['notificationId'],
             actionId: call.arguments['actionId'],

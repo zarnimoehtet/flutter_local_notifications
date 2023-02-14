@@ -336,15 +336,17 @@ class LinuxNotificationManager {
           return;
         }
         if (actionKey == _kDefaultActionName) {
-          FlutterLocalNotificationsPlatform.onDidReceiveNotificationResponse
-              .add(
-            NotificationResponse(
-              id: notify.id,
-              payload: notify.payload,
-              notificationResponseType:
-                  NotificationResponseType.selectedNotification,
-            ),
-          );
+          // TODO: fix
+          // FlutterLocalNotificationsPlatform
+          //     .instance.onDidReceiveNotificationResponse
+          //     .add(
+          //   NotificationResponse(
+          //     id: notify.id,
+          //     payload: notify.payload,
+          //     notificationResponseType:
+          //         NotificationResponseType.selectedNotification,
+          //   ),
+          // );
         } else {
           final LinuxNotificationActionInfo? actionInfo =
               notify.actions.firstWhere(
@@ -353,16 +355,18 @@ class LinuxNotificationManager {
           if (actionInfo == null) {
             return;
           }
-          FlutterLocalNotificationsPlatform.onDidReceiveNotificationResponse
-              .add(
-            NotificationResponse(
-              id: notify.id,
-              actionId: actionInfo.key,
-              payload: notify.payload,
-              notificationResponseType:
-                  NotificationResponseType.selectedNotificationAction,
-            ),
-          );
+          // TODO: fix
+          // FlutterLocalNotificationsPlatform
+          //     .instance.onDidReceiveNotificationResponse
+          //     .add(
+          //   NotificationResponse(
+          //     id: notify.id,
+          //     actionId: actionInfo.key,
+          //     payload: notify.payload,
+          //     notificationResponseType:
+          //         NotificationResponseType.selectedNotificationAction,
+          //   ),
+          // );
         }
       },
     );

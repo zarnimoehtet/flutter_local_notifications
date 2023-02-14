@@ -29,9 +29,12 @@ abstract class FlutterLocalNotificationsPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  /// Returns a [Stream] that emits when a user taps on  notification or a
+  /// Returns a [Stream] that emits when a user taps on notification or a
   /// notification action.
-  static final StreamController<NotificationResponse>
+  ///
+  /// To handle when a notification launched an
+  /// application, use [getNotificationAppLaunchDetails].
+  final StreamController<NotificationResponse>
       // ignore: close_sinks
       onDidReceiveNotificationResponse =
       StreamController<NotificationResponse>.broadcast();
