@@ -18,20 +18,22 @@ void main() {
   group('$FlutterLocalNotificationsPlatform', () {
     test('Cannot be implemented with `implements`', () {
       expect(() {
-        FlutterLocalNotificationsPlatform.instance =
+        final ImplementsFlutterLocalNotificationsPlatform instance =
             ImplementsFlutterLocalNotificationsPlatform();
+        FlutterLocalNotificationsPlatform.verify(instance);
       }, throwsAssertionError);
     });
 
     test('Can be mocked with `implements`', () {
       final FlutterLocalNotificationsPlatformMock mock =
           FlutterLocalNotificationsPlatformMock();
-      FlutterLocalNotificationsPlatform.instance = mock;
+      FlutterLocalNotificationsPlatform.verify(mock);
     });
 
     test('Can be extended', () {
-      FlutterLocalNotificationsPlatform.instance =
+      final ExtendsFlutterLocalNotificationsPlatform instance =
           ExtendsFlutterLocalNotificationsPlatform();
+      FlutterLocalNotificationsPlatform.verify(instance);
     });
   });
 }

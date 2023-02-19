@@ -14,19 +14,12 @@ abstract class FlutterLocalNotificationsPlatform extends PlatformInterface {
   /// Constructs an instance of [FlutterLocalNotificationsPlatform].
   FlutterLocalNotificationsPlatform() : super(token: _token);
 
-  static late FlutterLocalNotificationsPlatform _instance;
-
   static final Object _token = Object();
 
-  /// The default instance of [FlutterLocalNotificationsPlatform] to use.
-  static FlutterLocalNotificationsPlatform get instance => _instance;
-
-  /// Platform-specific plugins should set this with their own platform-specific
-  /// class that extends [FlutterLocalNotificationsPlatform] when they register
-  /// themselves.
-  static set instance(FlutterLocalNotificationsPlatform instance) {
-    PlatformInterface.verifyToken(instance, _token);
-    _instance = instance;
+  /// Calls [PlatformInterface.verify] to ensure implementers are using
+  /// `extends` instead of `implements`.
+  static void verify(FlutterLocalNotificationsPlatform instance) {
+    PlatformInterface.verify(instance, _token);
   }
 
   /// Returns a [Stream] that emits when a user taps on notification or a

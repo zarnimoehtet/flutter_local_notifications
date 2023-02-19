@@ -117,6 +117,11 @@ class MethodChannelFlutterLocalNotificationsPlugin
 /// Android implementation of the local notifications plugin.
 class AndroidFlutterLocalNotificationsPlugin
     extends MethodChannelFlutterLocalNotificationsPlugin {
+  /// Creates an instance of [AndroidFlutterLocalNotificationsPlugin].
+  AndroidFlutterLocalNotificationsPlugin() {
+    FlutterLocalNotificationsPlatform.verify(this);
+  }
+
   /// Initializes the plugin.
   ///
   /// Call this method on application before using the
@@ -602,6 +607,11 @@ class AndroidFlutterLocalNotificationsPlugin
 /// iOS implementation of the local notifications plugin.
 class IOSFlutterLocalNotificationsPlugin
     extends MethodChannelFlutterLocalNotificationsPlugin {
+  /// Creates an instance of [IOSFlutterLocalNotificationsPlugin].
+  IOSFlutterLocalNotificationsPlugin() {
+    FlutterLocalNotificationsPlatform.verify(this);
+  }
+
   /// Returns a stream that emits when a notification is triggered whilst the
   /// app is in the foreground on iOS versions older than 10.
   ///
@@ -861,6 +871,11 @@ class IOSFlutterLocalNotificationsPlugin
 /// macOS implementation of the local notifications plugin.
 class MacOSFlutterLocalNotificationsPlugin
     extends MethodChannelFlutterLocalNotificationsPlugin {
+  /// Creates an instance of [MacOSFlutterLocalNotificationsPlugin].
+  MacOSFlutterLocalNotificationsPlugin() {
+    FlutterLocalNotificationsPlatform.verify(this);
+  }
+
   /// Initializes the plugin.
   ///
   /// Call this method on application before using the plugin further.

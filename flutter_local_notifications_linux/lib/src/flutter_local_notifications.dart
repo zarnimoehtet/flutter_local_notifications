@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import 'flutter_local_notifications_platform_linux.dart';
@@ -10,8 +12,10 @@ import 'notifications_manager.dart';
 class LinuxFlutterLocalNotificationsPlugin
     extends FlutterLocalNotificationsPlatformLinux {
   /// Constructs an instance of [LinuxNotificationDetails].
-  LinuxFlutterLocalNotificationsPlugin()
-      : _manager = LinuxNotificationManager();
+  LinuxFlutterLocalNotificationsPlugin() {
+    _manager = LinuxNotificationManager();
+    FlutterLocalNotificationsPlatform.verify(this);
+  }
 
   /// Constructs an instance of [LinuxNotificationDetails]
   /// with the give [manager].
@@ -20,7 +24,11 @@ class LinuxFlutterLocalNotificationsPlugin
     LinuxNotificationManager manager,
   ) : _manager = manager;
 
-  final LinuxNotificationManager _manager;
+  late final LinuxNotificationManager _manager;
+
+  @override
+  StreamController<NotificationResponse> get onDidReceiveNotificationResponse =>
+      _manager.onDidReceiveNotificationResponse;
 
   /// Initializes the plugin.
   ///

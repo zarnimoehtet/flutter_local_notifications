@@ -22,36 +22,31 @@ import 'types.dart';
 /// type of the plugin to get the underlying platform-specific implementation
 /// if access to platform-specific APIs are needed.
 class FlutterLocalNotificationsPlugin {
-  /// Factory for create an instance of [FlutterLocalNotificationsPlugin].
-  factory FlutterLocalNotificationsPlugin() => _instance;
+  /// Factory for creating an instance of [FlutterLocalNotificationsPlugin].
+  factory FlutterLocalNotificationsPlugin() =>
+      FlutterLocalNotificationsPlugin._();
 
   FlutterLocalNotificationsPlugin._() {
     if (kIsWeb) {
       return;
     }
     if (defaultTargetPlatform == TargetPlatform.android) {
-      FlutterLocalNotificationsPlatform.instance =
-          AndroidFlutterLocalNotificationsPlugin();
+      _instance = AndroidFlutterLocalNotificationsPlugin();
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-      FlutterLocalNotificationsPlatform.instance =
-          IOSFlutterLocalNotificationsPlugin();
+      _instance = IOSFlutterLocalNotificationsPlugin();
     } else if (defaultTargetPlatform == TargetPlatform.macOS) {
-      FlutterLocalNotificationsPlatform.instance =
-          MacOSFlutterLocalNotificationsPlugin();
+      _instance = MacOSFlutterLocalNotificationsPlugin();
     } else if (defaultTargetPlatform == TargetPlatform.linux) {
-      FlutterLocalNotificationsPlatform.instance =
-          LinuxFlutterLocalNotificationsPlugin();
+      _instance = LinuxFlutterLocalNotificationsPlugin();
     }
   }
 
-  static final FlutterLocalNotificationsPlugin _instance =
-      FlutterLocalNotificationsPlugin._();
+  late final FlutterLocalNotificationsPlatform _instance;
 
   /// Returns a [Stream] that emits when a user taps on  notification or a
   /// notification action.
   StreamController<NotificationResponse> get onDidReceiveNotificationResponse =>
-      FlutterLocalNotificationsPlatform
-          .instance.onDidReceiveNotificationResponse;
+      _instance.onDidReceiveNotificationResponse;
 
   /// Returns the underlying platform-specific implementation of given type [T],
   /// which must be a concrete subclass of [FlutterLocalNotificationsPlatform](https://pub.dev/documentation/flutter_local_notifications_platform_interface/latest/flutter_local_notifications_platform_interface/FlutterLocalNotificationsPlatform-class.html)
@@ -74,24 +69,20 @@ class FlutterLocalNotificationsPlugin {
 
     if (defaultTargetPlatform == TargetPlatform.android &&
         T == AndroidFlutterLocalNotificationsPlugin &&
-        FlutterLocalNotificationsPlatform.instance
-            is AndroidFlutterLocalNotificationsPlugin) {
-      return FlutterLocalNotificationsPlatform.instance as T?;
+        _instance is AndroidFlutterLocalNotificationsPlugin) {
+      return _instance as T?;
     } else if (defaultTargetPlatform == TargetPlatform.iOS &&
         T == IOSFlutterLocalNotificationsPlugin &&
-        FlutterLocalNotificationsPlatform.instance
-            is IOSFlutterLocalNotificationsPlugin) {
-      return FlutterLocalNotificationsPlatform.instance as T?;
+        _instance is IOSFlutterLocalNotificationsPlugin) {
+      return _instance as T?;
     } else if (defaultTargetPlatform == TargetPlatform.macOS &&
         T == MacOSFlutterLocalNotificationsPlugin &&
-        FlutterLocalNotificationsPlatform.instance
-            is MacOSFlutterLocalNotificationsPlugin) {
-      return FlutterLocalNotificationsPlatform.instance as T?;
+        _instance is MacOSFlutterLocalNotificationsPlugin) {
+      return _instance as T?;
     } else if (defaultTargetPlatform == TargetPlatform.linux &&
         T == LinuxFlutterLocalNotificationsPlugin &&
-        FlutterLocalNotificationsPlatform.instance
-            is LinuxFlutterLocalNotificationsPlugin) {
-      return FlutterLocalNotificationsPlatform.instance as T?;
+        _instance is LinuxFlutterLocalNotificationsPlugin) {
+      return _instance as T?;
     }
 
     return null;
@@ -217,8 +208,7 @@ class FlutterLocalNotificationsPlugin {
               MacOSFlutterLocalNotificationsPlugin>()
           ?.getNotificationAppLaunchDetails();
     } else {
-      return await FlutterLocalNotificationsPlatform.instance
-              .getNotificationAppLaunchDetails() ??
+      return await _instance.getNotificationAppLaunchDetails() ??
           const NotificationAppLaunchDetails(false);
     }
   }
@@ -259,7 +249,7 @@ class FlutterLocalNotificationsPlugin {
               notificationDetails: notificationDetails?.linux,
               payload: payload);
     } else {
-      await FlutterLocalNotificationsPlatform.instance.show(id, title, body);
+      await _instance.show(id, title, body);
     }
   }
 
@@ -280,7 +270,7 @@ class FlutterLocalNotificationsPlugin {
               AndroidFlutterLocalNotificationsPlugin>()
           ?.cancel(id, tag: tag);
     } else {
-      await FlutterLocalNotificationsPlatform.instance.cancel(id);
+      await _instance.cancel(id);
     }
   }
 
@@ -289,7 +279,7 @@ class FlutterLocalNotificationsPlugin {
   /// This applies to notifications that have been scheduled and those that
   /// have already been presented.
   Future<void> cancelAll() async {
-    await FlutterLocalNotificationsPlatform.instance.cancelAll();
+    await _instance.cancelAll();
   }
 
   /// Schedules a notification to be shown at the specified date and time.
@@ -457,8 +447,7 @@ class FlutterLocalNotificationsPlugin {
           ?.periodicallyShow(id, title, body, repeatInterval,
               notificationDetails: notificationDetails.macOS, payload: payload);
     } else {
-      await FlutterLocalNotificationsPlatform.instance
-          .periodicallyShow(id, title, body, repeatInterval);
+      await _instance.periodicallyShow(id, title, body, repeatInterval);
     }
   }
 
@@ -540,9 +529,9 @@ class FlutterLocalNotificationsPlugin {
 
   /// Returns a list of notifications pending to be delivered/shown.
   Future<List<PendingNotificationRequest>> pendingNotificationRequests() =>
-      FlutterLocalNotificationsPlatform.instance.pendingNotificationRequests();
+      _instance.pendingNotificationRequests();
 
   /// Returns a list of notifications that are already delivered/shown.
   Future<List<ActiveNotification>> getActiveNotifications() =>
-      FlutterLocalNotificationsPlatform.instance.getActiveNotifications();
+      _instance.getActiveNotifications();
 }

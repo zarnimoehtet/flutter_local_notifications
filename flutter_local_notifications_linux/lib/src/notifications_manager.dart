@@ -40,8 +40,17 @@ class LinuxNotificationManager {
         _storage = storage ?? NotificationStorage();
 
   final DBusWrapper _dbus;
+
   final LinuxPlatformInfo _platformInfo;
+
   final NotificationStorage _storage;
+
+  /// Returns a [Stream] that emits when a user taps on notification or a
+  /// notification action.
+  final StreamController<NotificationResponse>
+      // ignore: close_sinks
+      onDidReceiveNotificationResponse =
+      StreamController<NotificationResponse>.broadcast();
 
   late final LinuxInitializationSettings _initializationSettings;
 
@@ -336,17 +345,14 @@ class LinuxNotificationManager {
           return;
         }
         if (actionKey == _kDefaultActionName) {
-          // TODO: fix
-          // FlutterLocalNotificationsPlatform
-          //     .instance.onDidReceiveNotificationResponse
-          //     .add(
-          //   NotificationResponse(
-          //     id: notify.id,
-          //     payload: notify.payload,
-          //     notificationResponseType:
-          //         NotificationResponseType.selectedNotification,
-          //   ),
-          // );
+          onDidReceiveNotificationResponse.add(
+            NotificationResponse(
+              id: notify.id,
+              payload: notify.payload,
+              notificationResponseType:
+                  NotificationResponseType.selectedNotification,
+            ),
+          );
         } else {
           final LinuxNotificationActionInfo? actionInfo =
               notify.actions.firstWhere(
@@ -355,18 +361,15 @@ class LinuxNotificationManager {
           if (actionInfo == null) {
             return;
           }
-          // TODO: fix
-          // FlutterLocalNotificationsPlatform
-          //     .instance.onDidReceiveNotificationResponse
-          //     .add(
-          //   NotificationResponse(
-          //     id: notify.id,
-          //     actionId: actionInfo.key,
-          //     payload: notify.payload,
-          //     notificationResponseType:
-          //         NotificationResponseType.selectedNotificationAction,
-          //   ),
-          // );
+          onDidReceiveNotificationResponse.add(
+            NotificationResponse(
+              id: notify.id,
+              actionId: actionInfo.key,
+              payload: notify.payload,
+              notificationResponseType:
+                  NotificationResponseType.selectedNotificationAction,
+            ),
+          );
         }
       },
     );
