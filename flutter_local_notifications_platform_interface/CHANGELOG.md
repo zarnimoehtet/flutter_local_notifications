@@ -1,6 +1,10 @@
-## [7.0.0-dev.1]
+## [7.0.0-dev.2]
 
 * **Breaking change** removed `DidReceiveNotificationResponseCallback` typedef
+
+## [7.0.0-dev.1]
+
+* **Breaking change** the `id` property of the `ActiveNotification` class is now nullable to help indicate that the notification may not have been created by the plugin e.g. it was from Firebase Cloud Messaging. Thanks to the PR from [frankvollebregt](https://github.com/frankvollebregt)
 
 ## [6.0.0]
 
