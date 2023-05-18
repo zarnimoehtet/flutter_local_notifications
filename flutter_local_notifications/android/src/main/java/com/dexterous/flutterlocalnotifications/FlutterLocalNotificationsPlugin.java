@@ -209,6 +209,7 @@ public class FlutterLocalNotificationsPlugin
           scheduleNotification(context, notificationDetails, false);
         }
       } catch (ExactAlarmPermissionException e) {
+        // TODO: update tag used to match name of class
         Log.e("notification", e.getMessage());
         removeNotificationFromCache(context, notificationDetails.id);
       }
@@ -227,6 +228,7 @@ public class FlutterLocalNotificationsPlugin
         removeNotificationFromCache(context, notificationDetails.id);
       }
     } catch (ExactAlarmPermissionException e) {
+      // TODO: update tag used to match name of class
       Log.e("notification", e.getMessage());
       removeNotificationFromCache(context, notificationDetails.id);
     }
@@ -1323,6 +1325,14 @@ public class FlutterLocalNotificationsPlugin
     binding.addOnNewIntentListener(this);
     binding.addRequestPermissionsResultListener(this);
     mainActivity = binding.getActivity();
+    Intent mainActivityIntent = mainActivity.getIntent();
+    if (!launchedActivityFromHistory(mainActivityIntent)) {
+      if (SELECT_FOREGROUND_NOTIFICATION_ACTION.equals(mainActivityIntent.getAction())) {
+        Map<String, Object> notificationResponse =
+            extractNotificationResponseMap(mainActivityIntent);
+        processForegroundNotificationAction(mainActivityIntent, notificationResponse);
+      }
+    }
   }
 
   @Override
@@ -1754,6 +1764,7 @@ public class FlutterLocalNotificationsPlugin
 
   @Override
   public boolean onNewIntent(Intent intent) {
+    System.out.println("mbui: onNewIntent");
     boolean res = sendNotificationPayloadMessage(intent);
     if (res && mainActivity != null) {
       mainActivity.setIntent(intent);
@@ -1766,17 +1777,21 @@ public class FlutterLocalNotificationsPlugin
         || SELECT_FOREGROUND_NOTIFICATION_ACTION.equals(intent.getAction())) {
       Map<String, Object> notificationResponse = extractNotificationResponseMap(intent);
       if (SELECT_FOREGROUND_NOTIFICATION_ACTION.equals(intent.getAction())) {
-        if (intent.getBooleanExtra(FlutterLocalNotificationsPlugin.CANCEL_NOTIFICATION, false)) {
-          NotificationManagerCompat.from(applicationContext)
-              .cancel(
-                  (int) notificationResponse.get(FlutterLocalNotificationsPlugin.NOTIFICATION_ID));
-        }
+        processForegroundNotificationAction(intent, notificationResponse);
       }
       channel.invokeMethod("didReceiveNotificationResponse", notificationResponse);
       return true;
     }
 
     return false;
+  }
+
+  private void processForegroundNotificationAction(
+      Intent intent, Map<String, Object> notificationResponse) {
+    if (intent.getBooleanExtra(FlutterLocalNotificationsPlugin.CANCEL_NOTIFICATION, false)) {
+      NotificationManagerCompat.from(applicationContext)
+          .cancel((int) notificationResponse.get(FlutterLocalNotificationsPlugin.NOTIFICATION_ID));
+    }
   }
 
   private void createNotificationChannelGroup(MethodCall call, Result result) {
